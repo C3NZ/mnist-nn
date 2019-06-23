@@ -47,8 +47,8 @@ def obtain_model_data() -> tuple:
     """
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
-    print(X_train.shape[0])
-    print(X_test.shape[0])
+    # Reshape our training and testing data into a 4d tensor
+    # (samples, image x, image y, and channels (colors))
     X_train = X_train.reshape(X_train.shape[0], 28, 28, 1)
     X_test = X_test.reshape(X_test.shape[0], 28, 28, 1)
 
@@ -61,14 +61,17 @@ def obtain_model_data() -> tuple:
     X_test /= 255
 
     # Create our categorical matricies (10 classes)
-    y_train = to_categorical(y_train)
-    y_test = to_categorical(y_test)
+    y_train = to_categorical(y_train, 10)
+    y_test = to_categorical(y_test, 10)
 
     # Return our data
     return (X_train, X_test), (y_train, y_test)
 
 
 def main():
+    """
+         Execute the nn and then evaluate the model
+    """
     (X_train, X_test), (y_train, y_test) = obtain_model_data()
     model = create_model()
 
