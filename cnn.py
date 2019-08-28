@@ -6,10 +6,10 @@ from keras.optimizers import SGD
 from keras.utils import to_categorical
 
 
-def create_model():
+def create_model() -> Sequential:
     """
         Create our NN with two conv layers and two dense layers.
-        
+
         Returns:
             A compiled keras sequential model ready to be fit.
     """
@@ -79,6 +79,7 @@ def main():
     epochs = 10
 
     model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)
+    model.save("mnist.h5")
 
     score = model.evaluate(X_test, y_test, verbose=0)
     print("Test loss:", score[0])
