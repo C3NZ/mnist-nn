@@ -9,7 +9,7 @@ from PIL import Image
 from werkzeug.datastructures import FileStorage
 
 graph = tf.get_default_graph()
-app = Flask(__name__)
+application = app = Flask(__name__)
 api = Api(
     app,
     version="1.0",
@@ -51,4 +51,4 @@ class Mnist(Resource):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000)
+    app.run(host="0.0.0.0")
