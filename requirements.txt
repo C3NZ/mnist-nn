@@ -5,4 +5,4 @@ keras
 numpy
 Pillow
 werkzeug
-pymongo
+mysqlclient
