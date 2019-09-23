@@ -1,8 +1,10 @@
 flask
 flask_restplus
 tensorflow
-keras
+keras==2.2.5
 numpy
 Pillow
 werkzeug
 mysqlclient
+pymongo
+dnspython
