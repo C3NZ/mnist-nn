@@ -1,7 +1,9 @@
+import datetime
 import os
 
-import MySQLdb as sql
+import dns
 import numpy as np
+import pymongo
 import tensorflow as tf
 from flask import (Flask, abort, jsonify, make_response, redirect,
                    render_template, request, url_for)
@@ -11,30 +13,20 @@ from keras.preprocessing.image import img_to_array
 from PIL import Image
 from werkzeug.datastructures import FileStorage
 
-# Setup db connection
-if "RDS_HOSTNAME" in os.environ:
-    DB = {
-        "NAME": os.environ["RDS_DB_NAME"],
-        "USER": os.environ["RDS_USERNAME"],
-        "PASSWORD": os.environ["RDS_PASSWORD"],
-        "HOST": os.environ["RDS_HOSTNAME"],
-        "PORT": os.environ["RDS_PORT"],
-    }
-
-    connection = sql.connect(
-        host=DB["HOST"],
-        user=DB["USER"],
-        password=DB["PASSWORD"],
-        port=DB["PORT"],
-        db=DB["name"],
-    )
-
-    cursor = connection.cursor()
-    cursor.execute('CREATE TABLE Info (ID)')
-
-
 graph = tf.get_default_graph()
 application = app = Flask(__name__)
+
+if os.environ.get("MUSER"):
+    user = os.environ.get("MUSER")
+    password = os.environ.get("PASSWORD")
+    url = os.environ.get("URL")
+
+    client = pymongo.MongoClient(f"mongodb+srv://{user}:{password}@{url}")
+    db = client.logs
+else:
+    client = pymongo.MongoClient("mongodb://localhost/mnist")
+    db = client.logs
+
 api = Api(
     app,
     version="1.0",
@@ -60,10 +52,6 @@ class Mnist(Resource):
     @api.doc(parser=single_parser, description="Enter an image")
     def post(self):
         """Uploads a new transaction to Rex (Click to see more)"""
-        if connection:
-            cursor = connection.cursor()
-            cursor.
-
 
         args = single_parser.parse_args()
         img: Image = Image.open(args.file)
@@ -77,7 +65,16 @@ class Mnist(Resource):
             all_pred = app.model.predict(file)
             pred = np.argmax(all_pred[0])
 
+        request_info = {
+            "pred": str(pred),
+            "filename": args.file.filename,
+            "time": datetime.datetime.now(),
+        }
+
+        db.logs.insert_one(request_info)
+
         return {"pred": str(pred)}
+
 
 if __name__ == "__main__":
     app.run()
